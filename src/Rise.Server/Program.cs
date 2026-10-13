@@ -30,7 +30,9 @@ try
         {
             var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection") ??
                                    throw new InvalidOperationException("Connection string 'DatabaseConnection' not found.");
-            o.UseSqlite(connectionString); // Swap Sqlite for your database provider (e.g. Sql Server, MySQL, PostgreSQL, etc.).
+            // MariaDB through the Pomelo provider. The server version is fixed, so no database
+            // connection is needed at design time (e.g. for "dotnet ef migrations add").
+            o.UseMySql(connectionString, new MariaDbServerVersion(new Version(11, 4)));
             o.EnableDetailedErrors();
             if (builder.Environment.IsDevelopment())
             {

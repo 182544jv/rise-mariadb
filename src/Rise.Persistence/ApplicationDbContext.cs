@@ -23,10 +23,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> opts) :
   
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        // All columns in the database have a maxlength of 4000.
-        // in NVARACHAR 4000 is the maximum length that can be indexed by a database.
-        // Some columns need more length, but these can be set on the configuration level for that Entity in particular.
-        configurationBuilder.Properties<string>().HaveMaxLength(4_000);
+        // MariaDB: no default max. length of 4000 for strings (as in SQL Server's NVARCHAR).
+        // In MariaDB, all VARCHAR columns of a table count towards the max. row size of 64KB
+        // (4000 utf8mb4 characters = 16000 bytes), which makes e.g. the Users table too large.
+        // Strings without a max. length are mapped to LONGTEXT, which is stored outside the row.
+        // Columns that are part of a key or index get an explicit max. length in their configuration.
         // All decimals columns should have 2 digits after the comma
         configurationBuilder.Properties<decimal>().HavePrecision(18, 2);
     }
